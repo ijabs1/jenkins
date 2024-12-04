@@ -1,20 +1,38 @@
-# Introduction 
-TODO: Give a short introduction of your project. Let this section explain the objectives or the motivation behind this project. 
+# Terraform Azure Project
 
-# Getting Started
-TODO: Guide users through getting your code up and running on their own system. In this section you can talk about:
-1.	Installation process
-2.	Software dependencies
-3.	Latest releases
-4.	API references
+## Overview
+This project is designed to manage and deploy Azure infrastructure using Terraform. It provides a modular and scalable approach to provisioning Azure resources, making it suitable for development, staging, and production environments. 
 
-# Build and Test
-TODO: Describe and show how to build your code and run the tests. 
+## Features
+- Infrastructure as Code (IaC) using Terraform.
+- Support for multiple environments: Dev, Staging, and Production.
+- Reusable modules for resources like Virtual Networks, Storage Accounts, and Virtual Machines.
+- Automation scripts for streamlined deployment and management.
 
-# Contribute
-TODO: Explain how other users and developers can contribute to make your code better. 
+## Repository Structure
+```plaintext
+terraform-aztraining-cat-uk/
+├── environments/                # Environment-specific configurations
+│   ├── dev/                     # Development environment
+│   │   ├── main.tf              # Terraform configuration
+│   │   ├── variables.tf         # Input variables for the environment
+│   │   ├── outputs.tf           # Output variables
+│   │   └── backend.tf           # Remote backend configuration
+│   ├── staging/                 # Staging environment
+│   └── prod/                    # Production environment
+├── modules/                     # Reusable Terraform modules
+│   ├── vnet/                    # Virtual network module
+│   ├── vm/                      # Virtual machine module
+│   └── storage-account/         # Storage account module
+├── shared-resources/            # Shared resources for all environments
+├── scripts/                     # Automation scripts (deploy/destroy)
+├── .gitignore                   # Ignore sensitive files
+├── README.md                    # Project documentation
+└── terraform.tfvars.example     # Example variable values
 
-If you want to learn more about creating good readme files then refer the following [guidelines](https://docs.microsoft.com/en-us/azure/devops/repos/git/create-a-readme?view=azure-devops). You can also seek inspiration from the below readme files:
-- [ASP.NET Core](https://github.com/aspnet/Home)
-- [Visual Studio Code](https://github.com/Microsoft/vscode)
-- [Chakra Core](https://github.com/Microsoft/ChakraCore)
+```
+## Contribution Workflow
+Clone the repository and create a feature branch:
+  ```bash
+  git clone <repo-url>
+  git checkout -b <feature-branch-name>
