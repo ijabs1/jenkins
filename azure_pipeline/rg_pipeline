@@ -1,0 +1,53 @@
+trigger:
+  - main
+
+pool:
+  name: aztraining-cat-uk-agent-vm-linux-01
+
+variables:
+  - name: resourceGroupName
+    value: 'my-resource-group'
+  - name: location
+    value: 'eastus'
+  - name: storageAccountName
+    value: 'mystorageaccount$(Build.BuildId)'
+  - name: storageSKU
+    value: 'Standard_LRS'
+  - name: azureSubscription
+    value: 'Azure-Service-Connection'  # Replace with your service connection name
+
+stages:
+  - stage: Deploy
+    jobs:
+      - job: CreateInfrastructure
+        steps:
+          - task: AzureCLI@2
+            inputs:
+              azureSubscription: $(azureSubscription)
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                # Create Resource Group
+                echo "Creating Resource Group..."
+                az group create \
+                  --name $(resourceGroupName) \
+                  --location $(location)
+
+                # Create Storage Account
+                echo "Creating Storage Account..."
+                az storage account create \
+                  --name $(storageAccountName) \
+                  --resource-group $(resourceGroupName) \
+                  --location $(location) \
+                  --sku $(storageSKU) \
+                  --kind StorageV2 \
+                  --https-only true \
+                  --min-tls-version TLS1_2
+
+                # Enable blob versioning
+                echo "Enabling blob versioning..."
+                az storage account blob-service-properties update \
+                  --account-name $(storageAccountName) \
+                  --enable-versioning true \
+                  --resource-group $(resourceGroupName)
+            displayName: 'Create Resource Group and Storage Account'
