@@ -14,7 +14,7 @@ variables:
   - name: storageSKU
     value: 'Standard_LRS'
   - name: azureSubscription
-    value: 'Azure-Service-Connection'  # Replace with your service connection name
+    value: 'aztraining-cat-uk-azure-sc' 
 
 stages:
   - stage: Deploy
