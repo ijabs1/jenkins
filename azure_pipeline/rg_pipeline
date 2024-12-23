@@ -2,7 +2,7 @@ trigger:
   - main
 
 pool:
-  name: aztraining-cat-uk-agent-vm-linux-01
+  name: aztraining-cat-uk-ado-agent-vm-linux-01
 
 variables:
   - name: resourceGroupName
