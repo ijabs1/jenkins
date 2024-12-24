@@ -5,75 +5,103 @@ pool:
   name: Aztraining-Cat-Uk-Agentpool
 
 variables:
-- name: terraformVersion
-  value: '1.5.7'
-- name: resource_group_name
-  value: 'rg-aztraining-ola'
-- name: storage_account_name
-  value: 'mystorageaccountola900'
-- name: location
-  value: 'uksouth'
+  - name: terraformVersion
+    value: '1.5.7'
+  - name: resource_group_name
+    value: 'rg-aztraining-ola'
+  - name: storage_account_name
+    value: 'mystorageaccountola900'
+  - name: location
+    value: 'uksouth'
 
 stages:
-- stage: Deploy
-  jobs:
-  - job: TerraformDeploy
-    steps:
-    - script: |
-        echo "Installing Terraform..."
-        curl -o terraform.zip https://releases.hashicorp.com/terraform/$(terraformVersion)/terraform_$(terraformVersion)_linux_amd64.zip
-        unzip terraform.zip
-        sudo mv terraform /usr/local/bin/
-        terraform -version
-      displayName: 'Install Terraform'
+  - stage: Setup
+    jobs:
+      - job: InstallTerraform
+        steps:
+          - script: |
+              echo "Installing Terraform..."
+              curl -o terraform.zip https://releases.hashicorp.com/terraform/$(terraformVersion)/terraform_$(terraformVersion)_linux_amd64.zip
+              unzip terraform.zip
+              sudo mv terraform /usr/local/bin/
+              terraform -version
+            displayName: 'Install Terraform'
 
-    - task: AzureCLI@2
-      displayName: 'Login to Azure'
-      inputs:
-        azureSubscription: 'aztraining-cat-uk-azure-sc' # Replace with your Azure service connection name
-        scriptType: bash
-        scriptLocation: inlineScript
-        inlineScript: |
-          echo "Setting up Azure authentication for Terraform..."
-          az account show
-    
-    - script: |
-        echo "Cleaning up Terraform state..."
-        rm -rf .terraform
-        rm -f terraform.tfstate terraform.tfstate.backup
-        terraform -chdir=$(System.DefaultWorkingDirectory)/terraform_pipeline init
-      displayName: 'Clean and Reinitialize Terraform'
-      workingDirectory: '$(System.DefaultWorkingDirectory)'
-      
+          - task: AzureCLI@2
+            displayName: 'Login to Azure'
+            inputs:
+              azureSubscription: 'aztraining-cat-uk-azure-sc'
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                echo "Setting up Azure authentication for Terraform..."
+                az account show
 
-    - script: |
-        echo "Validating Terraform configuration..."
-        terraform -chdir=$(System.DefaultWorkingDirectory)/terraform_pipeline validate
-      displayName: 'Terraform Validate'
-      workingDirectory: '$(System.DefaultWorkingDirectory)'
+          - script: |
+              echo "Cleaning up Terraform state..."
+              rm -rf .terraform
+              rm -f terraform.tfstate terraform.tfstate.backup
+              terraform -chdir=$(System.DefaultWorkingDirectory)/terraform_pipeline init
+            displayName: 'Clean and Reinitialize Terraform'
+            workingDirectory: '$(System.DefaultWorkingDirectory)'
 
+          - script: |
+              echo "Validating Terraform configuration..."
+              terraform -chdir=$(System.DefaultWorkingDirectory)/terraform_pipeline validate
+            displayName: 'Terraform Validate'
+            workingDirectory: '$(System.DefaultWorkingDirectory)'
 
-    - script: |
-        echo "Running Terraform Plan..."
-        terraform -chdir=$(System.DefaultWorkingDirectory)/terraform_pipeline plan \
-          -var="resource_group_name=$(resource_group_name)" \
-          -var="storage_account_name=$(storage_account_name)" \
-          -var="location=$(location)"
-      displayName: 'Terraform Plan'
-      workingDirectory: '$(System.DefaultWorkingDirectory)'
+  - stage: Plan
+    dependsOn: Setup
+    jobs:
+      - job: TerraformPlan
+        steps:
+          - task: AzureCLI@2
+            displayName: 'Azure Login'
+            inputs:
+              azureSubscription: 'aztraining-cat-uk-azure-sc'
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                az account show
 
-    - script: |
-        echo "Applying Terraform configuration..."
-        terraform -chdir=$(System.DefaultWorkingDirectory)/terraform_pipeline apply -auto-approve \
-          -var="resource_group_name=$(resource_group_name)" \
-          -var="storage_account_name=$(storage_account_name)" \
-          -var="location=$(location)"
-      displayName: 'Terraform Apply'
-      workingDirectory: '$(System.DefaultWorkingDirectory)'
+          - script: |
+              echo "Running Terraform Plan..."
+              terraform -chdir=$(System.DefaultWorkingDirectory)/terraform_pipeline plan \
+              -var="resource_group_name=$(resource_group_name)" \
+              -var="storage_account_name=$(storage_account_name)" \
+              -var="location=$(location)" \
+              -out=$(System.DefaultWorkingDirectory)/terraform.plan
+            displayName: 'Terraform Plan'
+            workingDirectory: '$(System.DefaultWorkingDirectory)'
 
+          - publish: $(System.DefaultWorkingDirectory)/terraform.plan
+            artifact: TerraformPlan
 
+  - stage: Apply
+    dependsOn: Plan
+    condition: succeeded()
+    jobs:
+      - deployment: TerraformApply
+        environment: 'Production'
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: AzureCLI@2
+                  displayName: 'Azure Login'
+                  inputs:
+                    azureSubscription: 'aztraining-cat-uk-azure-sc'
+                    scriptType: bash
+                    scriptLocation: inlineScript
+                    inlineScript: |
+                      az account show
 
+                - download: current
+                  artifact: TerraformPlan
 
-
-
-
+                - script: |
+                    echo "Applying Terraform configuration..."
+                    terraform -chdir=$(System.DefaultWorkingDirectory)/terraform_pipeline apply -auto-approve "$(Pipeline.Workspace)/TerraformPlan/terraform.plan"
+                  displayName: 'Terraform Apply'
+                  workingDirectory: '$(System.DefaultWorkingDirectory)'
