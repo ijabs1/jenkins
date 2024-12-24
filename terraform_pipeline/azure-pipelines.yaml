@@ -82,26 +82,22 @@ stages:
     dependsOn: Plan
     condition: succeeded()
     jobs:
-      - deployment: TerraformApply
-        environment: 'Production'
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - task: AzureCLI@2
-                  displayName: 'Azure Login'
-                  inputs:
-                    azureSubscription: 'aztraining-cat-uk-azure-sc'
-                    scriptType: bash
-                    scriptLocation: inlineScript
-                    inlineScript: |
-                      az account show
+      - job: TerraformApply
+        steps:
+          - task: AzureCLI@2
+            displayName: 'Azure Login'
+            inputs:
+              azureSubscription: 'aztraining-cat-uk-azure-sc'
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                az account show
 
-                - download: current
-                  artifact: TerraformPlan
+          - download: current
+            artifact: TerraformPlan
 
-                - script: |
-                    echo "Applying Terraform configuration..."
-                    terraform -chdir=$(System.DefaultWorkingDirectory)/terraform_pipeline apply -auto-approve "$(Pipeline.Workspace)/TerraformPlan/terraform.plan"
-                  displayName: 'Terraform Apply'
-                  workingDirectory: '$(System.DefaultWorkingDirectory)'
+          - script: |
+              echo "Applying Terraform configuration..."
+              terraform -chdir=$(System.DefaultWorkingDirectory)/terraform_pipeline apply -auto-approve "$(Pipeline.Workspace)/TerraformPlan/terraform.plan"
+            displayName: 'Terraform Apply'
+            workingDirectory: '$(System.DefaultWorkingDirectory)'
