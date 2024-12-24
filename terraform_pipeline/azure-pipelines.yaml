@@ -48,7 +48,7 @@ stages:
 
     - script: |
         echo "Validating Terraform configuration..."
-        terraform validate
+        terraform -chdir=$(System.DefaultWorkingDirectory)/terraform_pipeline validate
       displayName: 'Terraform Validate'
       workingDirectory: '$(System.DefaultWorkingDirectory)'
 
