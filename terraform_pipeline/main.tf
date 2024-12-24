@@ -9,7 +9,7 @@ terraform {
 
 provider "azurerm" {
   features {}
-  use_azure_cli_auth = true
+  // use_azure_cli_auth = true
 }
 
 resource "azurerm_resource_group" "rg" {
