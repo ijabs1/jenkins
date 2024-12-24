@@ -8,11 +8,11 @@ variables:
 - name: terraformVersion
   value: '1.5.7'
 - name: resource_group_name
-  value: 'my-resource-group'
+  value: 'rg-aztraining-ola'
 - name: storage_account_name
-  value: 'mystorageaccount'
+  value: 'mystorageaccountola900'
 - name: location
-  value: 'eastus'
+  value: 'uksouth'
 
 stages:
 - stage: Deploy
