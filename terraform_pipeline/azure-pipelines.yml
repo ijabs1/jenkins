@@ -43,7 +43,7 @@ stages:
         rm -f terraform.tfstate terraform.tfstate.backup
         terraform init
       displayName: 'Clean and Reinitialize Terraform'
-      workingDirectory: '$(System.DefaultWorkingDirectory)/terraform_pipeline/main.tf'
+      workingDirectory: '$(System.DefaultWorkingDirectory)'
       
 
     - script: |
