@@ -36,12 +36,21 @@ stages:
         inlineScript: |
           echo "Setting up Azure authentication for Terraform..."
           az account show
+    
+    - script: |
+        echo "Cleaning up Terraform state..."
+        rm -rf .terraform
+        rm -f terraform.tfstate terraform.tfstate.backup
+        terraform init
+      displayName: 'Clean and Reinitialize Terraform'
+      workingDirectory: '$(System.DefaultWorkingDirectory)'
 
     - script: |
-        echo "Initializing Terraform..."
-        terraform init
-      displayName: 'Terraform Init'
+        echo "Validating Terraform configuration..."
+        terraform validate
+      displayName: 'Terraform Validate'
       workingDirectory: '$(System.DefaultWorkingDirectory)'
+
 
     - script: |
         echo "Running Terraform Plan..."
