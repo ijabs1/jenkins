@@ -6,7 +6,7 @@ variable "resource_group_name" {
 variable "location" {
   type        = string
   description = "Azure region"
-  default     = "eastus"
+  default     = "uksouth"
 }
 
 variable "storage_account_name" {
