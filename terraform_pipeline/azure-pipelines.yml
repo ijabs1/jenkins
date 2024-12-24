@@ -1,0 +1,50 @@
+trigger:
+  - main
+
+pool:
+  name: Aztraining-Cat-Uk-Agentpool
+
+variables:
+- name: terraformVersion
+  value: '1.5.7'
+- name: resource_group_name
+  value: 'my-resource-group'
+- name: storage_account_name
+  value: 'mystorageaccount'
+- name: location
+  value: 'eastus'
+
+stages:
+- stage: Deploy
+  jobs:
+  - job: TerraformDeploy
+    steps:
+    - task: TerraformInstaller@1
+      displayName: 'Install Terraform'
+      inputs:
+        terraformVersion: $(terraformVersion)
+
+    - task: TerraformTaskV4@4
+      displayName: 'Terraform Init'
+      inputs:
+        provider: 'azurerm'
+        command: 'init'
+        workingDirectory: '$(System.DefaultWorkingDirectory)'
+
+    - task: TerraformTaskV4@4
+      displayName: 'Terraform Plan'
+      inputs:
+        provider: 'azurerm'
+        command: 'plan'
+        environmentServiceNameAzureRM: 'aztraining-cat-uk-azure-sc'  # Replace with your service connection
+        workingDirectory: '$(System.DefaultWorkingDirectory)'
+        commandOptions: '-var="resource_group_name=$(resource_group_name)" -var="storage_account_name=$(storage_account_name)" -var="location=$(location)"'
+
+    - task: TerraformTaskV4@4
+      displayName: 'Terraform Apply'
+      inputs:
+        provider: 'azurerm'
+        command: 'apply'
+        environmentServiceNameAzureRM: 'aztraining-cat-uk-azure-sc'  # Replace with your service connection
+        workingDirectory: '$(System.DefaultWorkingDirectory)'
+        commandOptions: '-auto-approve -var="resource_group_name=$(resource_group_name)" -var="storage_account_name=$(storage_account_name)" -var="location=$(location)"'
