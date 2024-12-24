@@ -10,7 +10,7 @@ variables:
   - name: location
     value: 'uksouth'
   - name: storageAccountName
-    value: 'mystorageaccount$(Build.BuildId)'  # Ensures unique name each time
+    value: 'mystorageaccountola$(Build.BuildId)'  # Ensures unique name each time
   - name: storageSKU
     value: 'Standard_LRS'
   - name: azureSubscription
