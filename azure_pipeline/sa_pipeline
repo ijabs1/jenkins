@@ -27,10 +27,16 @@ stages:
               scriptType: 'bash'
               scriptLocation: 'inlineScript'
               inlineScript: |
-                # Check if resource group exists before creating storage account
+                # Check if resource group exists, create if it doesn't
                 if az group show --name $(resourceGroupName) &>/dev/null; then
                     echo "Resource group $(resourceGroupName) exists. Proceeding with storage account creation..."
-                    
+                else
+                    echo "Resource group $(resourceGroupName) does not exist. Creating it..."
+                    az group create \
+                      --name $(resourceGroupName) \
+                      --location $(location)
+                    echo "Resource group created successfully."
+                fi    
                     # Create Storage Account
                     echo "Creating Storage Account..."
                     az storage account create \
