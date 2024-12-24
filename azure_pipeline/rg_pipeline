@@ -7,9 +7,9 @@ pool:
 
 variables:
   - name: resourceGroupName
-    value: 'my-resource-group'
+    value: 'rg-aztraining-ola'
   - name: location
-    value: 'eastus'
+    value: 'uksouth'
   - name: azureSubscription
     value: 'aztraining-cat-uk-azure-sc'  # Replace with your service connection name
 
