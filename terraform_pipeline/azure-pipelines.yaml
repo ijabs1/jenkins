@@ -38,24 +38,6 @@ stages:
                 az account show
 
           - script: |
-              echo "Configuring Terraform provider..."
-              cat > provider.tf << 'EOL'
-              terraform {
-                required_providers {
-                  azurerm = {
-                    source  = "hashicorp/azurerm"
-                    version = "~> 3.0"
-                  }
-                }
-              }
-              provider "azurerm" {
-                features {}
-              }
-              EOL
-            displayName: 'Configure Provider'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/terraform_pipeline'
-
-          - script: |
               echo "Initializing Terraform..."
               terraform -chdir=$(System.DefaultWorkingDirectory)/terraform_pipeline init -upgrade
             displayName: 'Initialize Terraform'
