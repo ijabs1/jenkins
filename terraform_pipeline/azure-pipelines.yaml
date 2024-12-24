@@ -41,7 +41,7 @@ stages:
         echo "Cleaning up Terraform state..."
         rm -rf .terraform
         rm -f terraform.tfstate terraform.tfstate.backup
-        terraform init
+        terraform -chdir=$(System.DefaultWorkingDirectory)/terraform_pipeline init
       displayName: 'Clean and Reinitialize Terraform'
       workingDirectory: '$(System.DefaultWorkingDirectory)'
       
@@ -55,7 +55,7 @@ stages:
 
     - script: |
         echo "Running Terraform Plan..."
-        terraform -chdir=/terraform_pipeline/main.tf  plan \
+        terraform -chdir=$(System.DefaultWorkingDirectory)/terraform_pipeline plan \
           -var="resource_group_name=$(resource_group_name)" \
           -var="storage_account_name=$(storage_account_name)" \
           -var="location=$(location)"
@@ -64,7 +64,7 @@ stages:
 
     - script: |
         echo "Applying Terraform configuration..."
-        terraform apply -auto-approve \
+        terraform -chdir=$(System.DefaultWorkingDirectory)/terraform_pipeline apply -auto-approve \
           -var="resource_group_name=$(resource_group_name)" \
           -var="storage_account_name=$(storage_account_name)" \
           -var="location=$(location)"
