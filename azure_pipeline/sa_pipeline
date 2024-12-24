@@ -1,0 +1,55 @@
+trigger:
+  - none
+
+pool:
+  name: Aztraining-Cat-Uk-Agentpool
+
+variables:
+  - name: resourceGroupName
+    value: 'rg-aztraining-ola'  
+  - name: location
+    value: 'uksouth'
+  - name: storageAccountName
+    value: 'mystorageaccount$(Build.BuildId)'  # Ensures unique name each time
+  - name: storageSKU
+    value: 'Standard_LRS'
+  - name: azureSubscription
+    value: 'aztraining-cat-uk-azure-sc' 
+
+stages:
+  - stage: Deploy
+    jobs:
+      - job: CreateStorageAccount
+        steps:
+          - task: AzureCLI@2
+            inputs:
+              azureSubscription: $(azureSubscription)
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                # Check if resource group exists before creating storage account
+                if az group show --name $(resourceGroupName) &>/dev/null; then
+                    echo "Resource group $(resourceGroupName) exists. Proceeding with storage account creation..."
+                    
+                    # Create Storage Account
+                    echo "Creating Storage Account..."
+                    az storage account create \
+                      --name $(storageAccountName) \
+                      --resource-group $(resourceGroupName) \
+                      --location $(location) \
+                      --sku $(storageSKU) \
+                      --kind StorageV2 \
+                      --https-only true \
+                      --min-tls-version TLS1_2
+
+                    # Enable blob versioning
+                    echo "Enabling blob versioning..."
+                    az storage account blob-service-properties update \
+                      --account-name $(storageAccountName) \
+                      --enable-versioning true \
+                      --resource-group $(resourceGroupName)
+                else
+                    echo "Error: Resource group $(resourceGroupName) does not exist. Please create it first."
+                    exit 1
+                fi
+            displayName: 'Create Storage Account'
