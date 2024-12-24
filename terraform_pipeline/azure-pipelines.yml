@@ -60,7 +60,7 @@ stages:
           -var="storage_account_name=$(storage_account_name)" \
           -var="location=$(location)"
       displayName: 'Terraform Plan'
-      workingDirectory: '$(System.DefaultWorkingDirectory)/terraform_pipeline/main.tf'
+      workingDirectory: '$(System.DefaultWorkingDirectory)'
 
     - script: |
         echo "Applying Terraform configuration..."
@@ -69,7 +69,7 @@ stages:
           -var="storage_account_name=$(storage_account_name)" \
           -var="location=$(location)"
       displayName: 'Terraform Apply'
-      workingDirectory: '$(System.DefaultWorkingDirectory)/terraform_pipeline/main.tf'
+      workingDirectory: '$(System.DefaultWorkingDirectory)'
 
 
 
