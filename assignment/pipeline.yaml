@@ -53,7 +53,7 @@ stages:
     jobs:
       - deployment: Deploy
         displayName: "Deploy Terraform Infrastructure"
-        #environment: 'Production'
+        environment: 'Production'
         pool:
           name: 'Aztraining-Cat-Uk-Agentpool'
         strategy:
