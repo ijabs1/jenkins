@@ -6,28 +6,45 @@ trigger: none
   #branches:
   #  include: ["main"]
 
+pool:
+  name: 'Aztraining-Cat-Uk-Agentpool'
+
+
 variables:
-  terraformVersion: '1.10.2'
+  - group: terraform-variables
+  #terraformVersion: '1.10.2'
 
 stages:
   - stage: Build
     displayName: "Build Terraform Code"
     jobs:
-      - job: Validate
-        displayName: "Validate and Format Terraform Code"
+      - job: ValidateAndInit
+        displayName: "Validate, Format, and Initialize Terraform"
         pool:
-          vmImage: 'ubuntu-latest'
+          name: 'Aztraining-Cat-Uk-Agentpool'
         steps:
-          - task: UseTerraform@0
+          - script: |
+              # Ensure Terraform is available
+              terraform --version
+            displayName: "Check Terraform Version"
+
+          - task: AzureCLI@2
             inputs:
-              terraformVersion: $(terraformVersion)
-            displayName: "Install Terraform"
+              azureSubscription: $(SERVICE_CONNECTION_NAME) # Replace with your service connection name
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                # Login to Azure using the service connection (automatically handled by AzureCLI task)
+                az account show
+
+                # Initialize Terraform with backend configuration
+                terraform init 
+            displayName: "Terraform Init"
 
           - script: |
-              terraform init
               terraform fmt -check
               terraform validate
-            displayName: "Initialize, Format, and Validate Terraform"
+            displayName: "Validate and Format Terraform Code"
 
   - stage: Release
     displayName: "Release Terraform Code"
@@ -36,20 +53,14 @@ stages:
     jobs:
       - deployment: Deploy
         displayName: "Deploy Terraform Infrastructure"
-        environment: "Production"
+        #environment: 'Production'
         pool:
-          vmImage: 'ubuntu-latest'
+          name: 'Aztraining-Cat-Uk-Agentpool'
         strategy:
           runOnce:
             deploy:
               steps:
-                - task: UseTerraform@0
-                  inputs:
-                    terraformVersion: $(terraformVersion)
-                  displayName: "Install Terraform"
-
                 - script: |
-                    terraform init
                     terraform plan -out=tfplan
                   displayName: "Terraform Plan"
 
