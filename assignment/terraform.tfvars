@@ -1,0 +1,8 @@
+resource_group_name             = "example-rg"
+location                        = "East US"
+vnet_name                       = "example-vnet"
+nsg_name                        = "example-nsg"
+subnet_name                     = "example-subnet"
+storage_account_name            = "examplestorageacct"
+storage_account_tier            = "Standard"
+storage_account_replication_type = "LRS"
