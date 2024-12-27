@@ -1,0 +1,58 @@
+trigger: none
+  #branches:
+    #exclude: ["*"]
+
+#pr:
+  #branches:
+  #  include: ["main"]
+
+variables:
+  terraformVersion: '1.10.2'
+
+stages:
+  - stage: Build
+    displayName: "Build Terraform Code"
+    jobs:
+      - job: Validate
+        displayName: "Validate and Format Terraform Code"
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - task: UseTerraform@0
+            inputs:
+              terraformVersion: $(terraformVersion)
+            displayName: "Install Terraform"
+
+          - script: |
+              terraform init
+              terraform fmt -check
+              terraform validate
+            displayName: "Initialize, Format, and Validate Terraform"
+
+  - stage: Release
+    displayName: "Release Terraform Code"
+    dependsOn: Build
+    condition: succeeded()
+    jobs:
+      - deployment: Deploy
+        displayName: "Deploy Terraform Infrastructure"
+        environment: "Production"
+        pool:
+          vmImage: 'ubuntu-latest'
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: UseTerraform@0
+                  inputs:
+                    terraformVersion: $(terraformVersion)
+                  displayName: "Install Terraform"
+
+                - script: |
+                    terraform init
+                    terraform plan -out=tfplan
+                  displayName: "Terraform Plan"
+
+                - script: |
+                    terraform apply -auto-approve tfplan
+                  displayName: "Terraform Apply"
