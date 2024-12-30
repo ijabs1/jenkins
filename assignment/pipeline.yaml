@@ -61,6 +61,7 @@ stages:
             deploy:
               steps:
                 - script: |
+                    terraform -chdir=$(System.DefaultWorkingDirectory)/assignment init
                     terraform -chdir=$(System.DefaultWorkingDirectory)/assignment plan -out=tfplan
                   displayName: "Terraform Plan"
 
