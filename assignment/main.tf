@@ -34,8 +34,8 @@ resource "azurerm_subnet" "subnet1" {
 
 # Subnet and NSG Association
 resource "azurerm_subnet_network_security_group_association" "nsg_subnet_association" {
-  subnet_id                 = azurerm_subnet.example.id
-  network_security_group_id = azurerm_network_security_group.example.id
+  subnet_id                 = azurerm_subnet.subnet1.id
+  network_security_group_id = azurerm_network_security_group.nsg.id
 }
 
 # Storage Account
