@@ -66,5 +66,5 @@ stages:
                   displayName: "Terraform Plan"
 
                 - script: |
-                    #terraform apply -auto-approve tfplan
+                    terraform apply -auto-approve tfplan
                   displayName: "Terraform Apply"
