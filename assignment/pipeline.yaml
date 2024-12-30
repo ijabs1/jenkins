@@ -64,7 +64,11 @@ stages:
                     terraform -chdir=$(System.DefaultWorkingDirectory)/assignment init
                     terraform -chdir=$(System.DefaultWorkingDirectory)/assignment plan -out=tfplan
                   displayName: "Terraform Plan"
+                  
+                - script: |
+                    ls -l $(System.DefaultWorkingDirectory)/assignment
+                  displayName: "Debug: List Directory Contents"
 
                 - script: |
-                    terraform apply -auto-approve tfplan
+                    terraform -chdir=$(System.DefaultWorkingDirectory)/assignment apply -auto-approve tfplan
                   displayName: "Terraform Apply"
