@@ -1,9 +1,9 @@
 trigger: none
 
-pr:
-  branches:
-    include: 
-      - main
+#pr:
+ # branches:
+ #   include: 
+ #     - main
 
 pool:
   name: 'Aztraining-Cat-Uk-Agentpool'
@@ -70,7 +70,7 @@ stages:
   - stage: Apply
     displayName: "Apply Terraform Changes"
     dependsOn: Plan
-    condition: and(succeeded(), eq(variables['Build.Reason'], 'PullRequest'), eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/main'))
+    condition: succeeded() #and(succeeded()#, eq(variables['Build.Reason'], 'PullRequest'), eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/main'))
     jobs:
       - deployment: Deploy
         displayName: "Deploy Terraform Infrastructure"
