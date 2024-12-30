@@ -1,5 +1,4 @@
-trigger: 
-  feature-olalekan
+trigger: none
   #branches:
     #exclude: ["*"]
 
