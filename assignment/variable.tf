@@ -36,7 +36,7 @@ variable "subnet_address_prefixes" {
 
 variable "storage_account_name" {
   description = "Name of the storage account"
-  default = "sa-az-training-ola"
+  default = "saaztrainingola"
 }
 
 variable "storage_account_tier" {
