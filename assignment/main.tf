@@ -18,14 +18,14 @@ resource "azurerm_virtual_network" "vnet-az" {
 }
 
 # Network Security Group
-resource "azurerm_network_security_group" "example" {
+resource "azurerm_network_security_group" "nsg" {
   name                = var.nsg_name
   location            = azurerm_resource_group.az-training-rg.location
   resource_group_name = azurerm_resource_group.az-training-rg.name
 }
 
 # Subnet
-resource "azurerm_subnet" "example" {
+resource "azurerm_subnet" "subnet1" {
   name                 = var.subnet_name
   resource_group_name  = azurerm_resource_group.az-training-rg.name
   virtual_network_name = azurerm_virtual_network.vnet-az.name
@@ -33,13 +33,13 @@ resource "azurerm_subnet" "example" {
 }
 
 # Subnet and NSG Association
-resource "azurerm_subnet_network_security_group_association" "example" {
+resource "azurerm_subnet_network_security_group_association" "nsg_subnet_association" {
   subnet_id                 = azurerm_subnet.example.id
   network_security_group_id = azurerm_network_security_group.example.id
 }
 
 # Storage Account
-resource "azurerm_storage_account" "example" {
+resource "azurerm_storage_account" "sa_account" {
   name                     = var.storage_account_name
   resource_group_name      = azurerm_resource_group.az-training-rg.name
   location                 = azurerm_resource_group.az-training-rg.location
