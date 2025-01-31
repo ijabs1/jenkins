@@ -100,5 +100,6 @@ echo
 echo "Cleaning up temporary files and directory..."
 rm -rf "$TEMP_DIR"
 
+echo "Testing Jenkins Pipeline"
 echo
 echo "Script completed successfully!"
